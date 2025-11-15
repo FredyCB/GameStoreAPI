@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from routes import Clientes, Inventario, Juegos, Orden
 
-app = FastAPI(title="GameStore API (adapted)")
+app = FastAPI(title="GameStore API")
 
 app.include_router(Clientes.router, prefix="/clientes", tags=["Clientes"])
 app.include_router(Inventario.router, prefix="/inventario", tags=["Inventario"])
