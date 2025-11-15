@@ -4,10 +4,6 @@ from schemas.Inventario import InventarioCreate
 
 class InventarioController:
     @staticmethod
-    def list_all(db: Session):
-        return db.query(Inventario).all()
-
-    @staticmethod
     def get(db: Session, inv_id: int):
         return db.query(Inventario).filter(Inventario.id == inv_id).first()
 

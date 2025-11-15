@@ -23,4 +23,3 @@ class JuegoController:
         if not obj: return None
         db.delete(obj); db.commit()
         return obj
-
