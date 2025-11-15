@@ -1,26 +1,44 @@
 import os
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
-from urllib.parse import quote_plus
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
 
+# Cargar variables del archivo .env
 load_dotenv()
 
-DRIVER = os.getenv('AZURE_SQL_DRIVER', 'ODBC Driver 17 for SQL Server')
-SERVER = os.getenv('AZURE_SQL_SERVER', 'your_server.database.windows.net')
-DATABASE = os.getenv('AZURE_SQL_DATABASE', 'your_db')
-UID = os.getenv('AZURE_SQL_UID', 'user')
-PWD = os.getenv('AZURE_SQL_PWD', 'pwd')
+SQL_DRIVER = os.getenv("SQL_DRIVER")
+SQL_SERVER = os.getenv("SQL_SERVER")
+SQL_DATABASE = os.getenv("SQL_DATABASE")
+SQL_USERNAME = os.getenv("SQL_USERNAME")
+SQL_PASSWORD = os.getenv("SQL_PASSWORD")
 
-odbc_str = f"DRIVER={{{DRIVER}}};SERVER={SERVER};DATABASE={DATABASE};UID={UID};PWD={PWD};Encrypt=yes;TrustServerCertificate=no"
-params = quote_plus(odbc_str)
-SQLALCHEMY_DATABASE_URL = f"mssql+pyodbc:///?odbc_connect={params}"
+# Construir la URL de conexión
+DATABASE_URL = (
+    "mssql+pyodbc://"
+    f"{SQL_USERNAME}:{SQL_PASSWORD}"
+    f"@{SQL_SERVER}:1433"
+    f"/{SQL_DATABASE}"
+    f"?driver={(SQL_DRIVER or '').replace(' ', '+')}"
+)
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL, fast_executemany=True)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# Crear el engine SQLAlchemy
+engine = create_engine(
+    DATABASE_URL,
+    fast_executemany=True,
+    echo=False
+)
+
+# Crear la sesión
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine
+)
+
+# Clase base para los modelos
 Base = declarative_base()
 
+# Dependencia de sesión para FastAPI
 def get_db():
     db = SessionLocal()
     try:
