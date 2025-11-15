@@ -7,5 +7,5 @@ class Cliente(Base):
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String(200), nullable=False)
     email = Column(String(200), unique=True)
-    telefono = Column(String(50))
+    telefono = Column(String(20), unique=True)
     fecha_registro = Column(DateTime, server_default=func.now())

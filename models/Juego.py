@@ -9,4 +9,3 @@ class Juego(Base):
     titulo = Column(String(250), nullable=False)
     descripcion = Column(Text)
     precio = Column(DECIMAL(10,2))
-    inventario = relationship("Inventario", back_populates="juegos")

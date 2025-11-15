@@ -9,6 +9,4 @@ class DetalleOrden(Base):
     inventario_id = Column(Integer, ForeignKey("Inventario.id"), nullable=False)  # referencia al inventario
     cantidad = Column(Integer, nullable=False)
     precio_unitario = Column(DECIMAL(10,2))
-    orden = relationship("Orden", back_populates="detalles")
-    # relación con inventario si la necesitas:
-    # inventario = relationship("Inventario")
+

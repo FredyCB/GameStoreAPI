@@ -9,4 +9,3 @@ class Inventario(Base):
     nombre = Column(String(200), nullable=False)
     ubicacion = Column(String(200))
     fecha_actualizacion = Column(DateTime, server_default=func.now())
-    juegos = relationship("Juego", back_populates="inventario", cascade="all, delete-orphan")

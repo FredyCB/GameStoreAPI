@@ -21,7 +21,7 @@ def get_client(cliente_id: int, db: Session = Depends(get_db)):
 def create_client(payload: ClienteCreate, db: Session = Depends(get_db)):
     return ClienteController.create(db, payload)
 
-# stray placeholder removed; use the controller instance's update method below
+
 
 @router.delete("/{cliente_id}")
 def delete_client(cliente_id: int, db: Session = Depends(get_db)):

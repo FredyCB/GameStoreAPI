@@ -10,5 +10,4 @@ class Orden(Base):
     fecha_orden = Column(DateTime, server_default=func.now())
     total = Column(DECIMAL(12,2), default=0)
     estado = Column(String(50), default="PENDIENTE")
-    detalles = relationship("DetalleOrden", back_populates="orden", cascade="all, delete-orphan")
 

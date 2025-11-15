@@ -5,6 +5,7 @@ class ClienteBase(BaseModel):
     nombre: str
     email: Optional[str] = None
     telefono: Optional[str] = None
+    fecha_registro: Optional[str] = None
 
 class ClienteCreate(ClienteBase): ...
 class ClienteUpdate(ClienteBase): ...
