@@ -21,8 +21,7 @@ def get_client(cliente_id: int, db: Session = Depends(get_db)):
 def create_client(payload: ClienteCreate, db: Session = Depends(get_db)):
     return ClienteController.create(db, payload)
 
-def update(self, cliente_id, payload, db):
-    raise NotImplementedError
+# stray placeholder removed; use the controller instance's update method below
 
 @router.delete("/{cliente_id}")
 def delete_client(cliente_id: int, db: Session = Depends(get_db)):
@@ -30,10 +29,3 @@ def delete_client(cliente_id: int, db: Session = Depends(get_db)):
     if not res:
         raise HTTPException(404, "Cliente not found")
     return {"detail": "deleted"}
-
-@router.put("/{cliente_id}", response_model=ClienteResponse)
-def update_client(cliente_id: int, payload: ClienteCreate, db: Session = Depends(get_db)):
-    c = ClienteController.update(db, cliente_id, payload)
-    if not c:
-        raise HTTPException(404, "Cliente not found")
-    return c
