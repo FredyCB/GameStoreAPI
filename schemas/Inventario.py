@@ -9,12 +9,24 @@ class InventarioBase(BaseModel):
     ubicacion: Optional[str] = None
 
 
-class InventarioCreate(InventarioBase): ...
-class InventarioUpdate(InventarioBase): ...
+class InventarioCreate(InventarioBase):
+    pass
 
-class InventarioResponse(InventarioBase):
+
+class InventarioUpdateStock(BaseModel):
+    stock: int
+
+
+class InventarioUpdatePrecio(BaseModel):
+    precio: float
+
+
+class InventarioResponse(BaseModel):
     id: int
-    fecha_actualizacion: Optional[datetime] = None
+    nombre: str
+    precio: float
+    stock: int
+    fecha_actualizacion: Optional[datetime]
 
     class Config:
         orm_mode = True
