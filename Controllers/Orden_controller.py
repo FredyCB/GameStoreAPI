@@ -32,7 +32,7 @@ class OrdenController:
                 raise Exception(f"Inventario {d.inventario_id} not found")
             # Optionally check stock on inv (if you keep stock elsewhere)
             detalle = DetalleOrden(orden_id=orden.id, inventario_id=d.inventario_id,
-                                   cantidad=d.cantidad, precio_unitario=d.precio_unitario)
+                                    cantidad=d.cantidad, precio_unitario=d.precio_unitario)
             db.add(detalle)
         db.commit()
         db.refresh(orden)
