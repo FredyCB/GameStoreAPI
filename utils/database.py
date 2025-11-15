@@ -2,29 +2,27 @@ import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-from dotenv import load_dotenv
 import urllib.parse
 
-# Cargar variables del archivo .env
 load_dotenv()
 
-SQL_SERVER   = os.getenv("SQL_SERVER")
-SQL_DATABASE = os.getenv("SQL_DATABASE")
-SQL_USERNAME = os.getenv("SQL_USERNAME")
-SQL_PASSWORD = os.getenv("SQL_PASSWORD")
-SQL_DRIVER   = os.getenv("SQL_DRIVER")
+SQL_SERVER   = os.getenv("SQL_SERVER", "")
+SQL_DATABASE = os.getenv("SQL_DATABASE", "")
+SQL_USERNAME = os.getenv("SQL_USERNAME", "")
+SQL_PASSWORD = os.getenv("SQL_PASSWORD", "")
+SQL_DRIVER   = os.getenv("SQL_DRIVER", "")
 
-# Construcción correcta del string de conexión
-connection_string = (
+# Construcción del string ODBC
+raw_conn = (
     f"DRIVER={{{SQL_DRIVER}}};"
     f"SERVER={SQL_SERVER};"
     f"DATABASE={SQL_DATABASE};"
     f"UID={SQL_USERNAME};"
     f"PWD={SQL_PASSWORD}"
-)
+).replace("SQL_DRIVER", SQL_DRIVER)
 
-# Codificar para SQLAlchemy
-connection_uri = "mssql+pyodbc:///?odbc_connect=" + urllib.parse.quote_plus(connection_string)
+# Codificación para SQLAlchemy
+connection_uri = "mssql+pyodbc:///?odbc_connect=" + urllib.parse.quote_plus(raw_conn)
 
 engine = create_engine(connection_uri, pool_pre_ping=True)
 

@@ -8,4 +8,5 @@ class Inventario(Base):
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String(200), nullable=False)
     ubicacion = Column(String(200))
-    fecha_actualizacion = Column(DateTime, server_default=func.now())
+    stock = Column(Integer, default=0)
+    fecha_actualizacion = Column(DateTime, server_default=func.now(), onupdate=func.now())
