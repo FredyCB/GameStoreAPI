@@ -16,6 +16,14 @@ class InventarioController:
 
     @staticmethod
     def create(db: Session, data: InventarioCreate):
+        # 🔎 Validar nombre duplicado
+        exists = db.query(Inventario).filter(
+            Inventario.nombre == data.nombre
+        ).first()
+
+        if exists:
+            raise ValueError("Ya existe un juego con ese nombre en el inventario.")
+
         obj = Inventario(
             nombre=data.nombre,
             precio=data.precio,
@@ -29,17 +37,20 @@ class InventarioController:
 
     @staticmethod
     def update(db: Session, inv_id: int, data: InventarioUpdate):
-        """
-        PUT: reemplaza TODO el recurso. Se espera que el cliente envíe
-        todas las propiedades necesarias (nombre, precio, stock, ubicacion).
-        Usamos query.update() para aplicar los cambios de forma atómica.
-        """
         q = db.query(Inventario).filter(Inventario.id == inv_id)
         obj = q.first()
         if not obj:
             return None
 
-        # Construimos el diccionario con los valores a actualizar.
+        # 🛑 Evitar duplicado con otro registro
+        name_conflict = db.query(Inventario).filter(
+            Inventario.nombre == data.nombre,
+            Inventario.id != inv_id
+        ).first()
+
+        if name_conflict:
+            raise ValueError("Otro inventario ya usa ese nombre.")
+
         update_values = {
             "nombre": data.nombre,
             "precio": data.precio,
@@ -48,16 +59,10 @@ class InventarioController:
         }
 
         try:
-            # update() aplica los cambios en la base y es más fiable para
-            # este caso "reemplazar todo".
             q.update(update_values, synchronize_session="fetch")
             db.commit()
-            # obtener el objeto actualizado y retornarlo
-            updated = q.first()
-            return updated
+            return q.first()
         except SQLAlchemyError as e:
-            # Si hay error en la BD devolvemos None o lanzamos;
-            # aquí se re-lanza para que la ruta lo convierta en 500 con detalle.
             db.rollback()
             raise e
 
