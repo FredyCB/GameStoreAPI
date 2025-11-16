@@ -1,20 +1,19 @@
-# schemas/Juego.py
 from pydantic import BaseModel
-from decimal import Decimal
+from typing import Optional
 
 class JuegoBase(BaseModel):
-    nombre: str
-    precio: Decimal
+    nombre_juego: str
+    inventario_id: int
 
 class JuegoCreate(JuegoBase):
     pass
 
-class JuegoUpdate(JuegoBase):
-    pass
+class JuegoUpdate(BaseModel):
+    nombre_juego: Optional[str] = None
+    inventario_id: Optional[int] = None
 
 class JuegoResponse(JuegoBase):
     id: int
-    inventario_id: int
 
     class Config:
         orm_mode = True

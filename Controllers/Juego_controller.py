@@ -1,8 +1,6 @@
 from sqlalchemy.orm import Session
 from models.Juego import Juego
-from schemas.Juego import JuegoCreate
-from models.Inventario import Inventario  # Para registrar inventario automáticamente
-from typing import Any, cast
+from schemas.Juego import JuegoCreate, JuegoUpdate
 
 class JuegoController:
 
@@ -12,56 +10,41 @@ class JuegoController:
 
     @staticmethod
     def get(db: Session, juego_id: int):
-        return db.query(Juego).filter(Juego.inventario_id == juego_id).first()
+        return db.query(Juego).filter(Juego.id == juego_id).first()
 
     @staticmethod
-    def create(db: Session, data: JuegoCreate):
-        # Crear registro en Inventario primero
-        inventario = Inventario(nombre=data.nombre, precio=float(data.precio))
-        db.add(inventario)
-        db.commit()
-        db.refresh(inventario)
-
-        # Crear juego vinculado al inventario
-        juego = Juego(
-            inventario_id=inventario.id,
-            nombre=data.nombre,
-            precio=float(data.precio)
+    def create(db: Session, payload: JuegoCreate):
+        obj = Juego(
+            nombre_juego=payload.nombre_juego,
+            inventario_id=payload.inventario_id
         )
-        db.add(juego)
+        db.add(obj)
         db.commit()
-        db.refresh(juego)
-        return juego
+        db.refresh(obj)
+        return obj
 
     @staticmethod
-    def update(db: Session, juego_id: int, data: JuegoCreate):
-        juego = db.query(Juego).filter(Juego.id == juego_id).first()
-        if not juego:
+    def update(db: Session, juego_id: int, payload: JuegoUpdate):
+        obj = db.query(Juego).filter(Juego.id == juego_id).first()
+        if not obj:
             return None
-        # Actualizar datos en inventario también
-        inv = db.query(Inventario).filter(Inventario.id == juego.inventario_id).first()
-        if inv:
-            inv_any = cast(Any, inv)
-            inv_any.nombre = data.nombre
-            inv_any.precio = float(data.precio)
 
-        juego_any = cast(Any, juego)
-        juego_any.nombre = data.nombre
-        juego_any.precio = float(data.precio)
+        if payload.nombre_juego is not None:
+            obj.nombre_juego = payload.nombre_juego
+        
+        if payload.inventario_id is not None:
+            obj.inventario_id = payload.inventario_id
+
         db.commit()
-        db.refresh(juego)
-        return juego
+        db.refresh(obj)
+        return obj
 
     @staticmethod
     def delete(db: Session, juego_id: int):
-        juego = db.query(Juego).filter(Juego.id == juego_id).first()
-        if not juego:
+        obj = db.query(Juego).filter(Juego.id == juego_id).first()
+        if not obj:
             return None
 
-        # También eliminar inventario vinculado
-        inv = db.query(Inventario).filter(Inventario.id == juego.inventario_id).first()
-        if inv:
-            db.delete(inv)
-        db.delete(juego)
+        db.delete(obj)
         db.commit()
-        return juego
+        return obj

@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
-from decimal import Decimal
+from sqlalchemy.exc import SQLAlchemyError
 from models.Inventario import Inventario
-from schemas.Inventario import InventarioCreate, InventarioUpdateStock, InventarioUpdatePrecio
-from typing import Any, Mapping
+from schemas.Inventario import InventarioCreate, InventarioUpdate
+
 
 class InventarioController:
 
@@ -19,7 +19,7 @@ class InventarioController:
         obj = Inventario(
             nombre=data.nombre,
             precio=data.precio,
-            stock=data.stock if data.stock is not None else 0,
+            stock=data.stock,
             ubicacion=data.ubicacion
         )
         db.add(obj)
@@ -28,56 +28,45 @@ class InventarioController:
         return obj
 
     @staticmethod
-    def update_stock(db: Session, inv_id: int, data: Any):
+    def update(db: Session, inv_id: int, data: InventarioUpdate):
         """
-        data puede ser un Pydantic model o un dict. Normalizamos y aplicamos solo si hay valor.
+        PUT: reemplaza TODO el recurso. Se espera que el cliente envíe
+        todas las propiedades necesarias (nombre, precio, stock, ubicacion).
+        Usamos query.update() para aplicar los cambios de forma atómica.
         """
-        obj = db.query(Inventario).filter(Inventario.id == inv_id).first()
+        q = db.query(Inventario).filter(Inventario.id == inv_id)
+        obj = q.first()
         if not obj:
             return None
 
-        # Normalizar payload a dict
-        if hasattr(data, "dict"):
-            payload = data.dict()
-        elif isinstance(data, Mapping):
-            payload = dict(data)
-        else:
-            # si llega otro tipo, intentar convertir vía __dict__
-            payload = getattr(data, "__dict__", {}) or {}
+        # Construimos el diccionario con los valores a actualizar.
+        update_values = {
+            "nombre": data.nombre,
+            "precio": data.precio,
+            "stock": data.stock,
+            "ubicacion": data.ubicacion
+        }
 
-        # Tomar el valor solo si viene presente (no sobrescribir con None)
-        if "stock" in payload and payload["stock"] is not None:
-            try:
-                obj.stock = payload["stock"]
-            except (TypeError, ValueError):
-                # si la conversión falla, no aplicamos el cambio y podemos optar por raise o ignorar.
-                raise ValueError("El campo 'stock' debe ser un entero válido")
-
-        db.commit()
-        db.refresh(obj)
-        return obj
+        try:
+            # update() aplica los cambios en la base y es más fiable para
+            # este caso "reemplazar todo".
+            q.update(update_values, synchronize_session="fetch")
+            db.commit()
+            # obtener el objeto actualizado y retornarlo
+            updated = q.first()
+            return updated
+        except SQLAlchemyError as e:
+            # Si hay error en la BD devolvemos None o lanzamos;
+            # aquí se re-lanza para que la ruta lo convierta en 500 con detalle.
+            db.rollback()
+            raise e
 
     @staticmethod
-    def update_precio(db: Session, inv_id: int, data: Any):
-        """
-        Actualiza precio. data puede ser Pydantic model o dict.
-        """
+    def delete(db: Session, inv_id: int):
         obj = db.query(Inventario).filter(Inventario.id == inv_id).first()
         if not obj:
             return None
 
-        # Normalizar payload a dict
-        if hasattr(data, "dict"):
-            payload = data.dict()
-        elif isinstance(data, Mapping):
-            payload = dict(data)
-        else:
-            payload = getattr(data, "__dict__", {}) or {}
-        if "precio" in payload and payload["precio"] is not None:
-            try:
-                setattr(obj, "precio", float(payload["precio"]))
-            except (TypeError, ValueError):
-                raise ValueError("El campo 'precio' debe ser un número válido")
+        db.delete(obj)
         db.commit()
-        db.refresh(obj)
         return obj

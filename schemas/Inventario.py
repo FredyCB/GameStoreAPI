@@ -5,28 +5,19 @@ from datetime import datetime
 class InventarioBase(BaseModel):
     nombre: str
     precio: float
-    stock: Optional[int] = None
+    stock: int
     ubicacion: Optional[str] = None
-
 
 class InventarioCreate(InventarioBase):
     pass
 
+class InventarioUpdate(InventarioBase):
+    pass
 
-class InventarioUpdateStock(BaseModel):
-    stock: int
-
-
-class InventarioUpdatePrecio(BaseModel):
-    precio: float
-
-
-class InventarioResponse(BaseModel):
+class InventarioResponse(InventarioBase):
     id: int
-    nombre: str
-    precio: float
-    stock: int
-    fecha_actualizacion: Optional[datetime]
+    fecha_actualizacion: Optional[datetime] = None
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True   # reemplaza orm_mode
+    }
