@@ -1,36 +1,29 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from utils.database import get_db
-from schemas.Juego import JuegoCreate, JuegoUpdate, JuegoResponse
 from Controllers.Juego_controller import JuegoController
+from schemas.Juego import JuegoCatalogoResponse, JuegoSearchResponse
 
 router = APIRouter()
+    
 
-@router.get("/", response_model=list[JuegoResponse])
-def list_juegos(db: Session = Depends(get_db)):
-    return JuegoController.list_all(db)
+@router.get("/", response_model=list[JuegoCatalogoResponse])
+def listar_juegos(db: Session = Depends(get_db)):
+    return JuegoController.list_catalog(db)
 
-@router.get("/{juego_id}", response_model=JuegoResponse)
-def get_juego(juego_id: int, db: Session = Depends(get_db)):
-    j = JuegoController.get(db, juego_id)
-    if not j:
-        raise HTTPException(404, "Juego not found")
-    return j
 
-@router.post("/", response_model=JuegoResponse)
-def create_juego(payload: JuegoCreate, db: Session = Depends(get_db)):
-    return JuegoController.create(db, payload)
+@router.get("/buscar", response_model=JuegoSearchResponse)
+def buscar_juego(
+    nombre: str | None = None,
+    inventario_id: int | None = None,
+    db: Session = Depends(get_db)
+):
+    if not nombre and not inventario_id:
+        raise HTTPException(400, "Debe enviar nombre o inventario_id")
 
-@router.put("/{juego_id}", response_model=JuegoResponse)
-def update_juego(juego_id: int, payload: JuegoUpdate, db: Session = Depends(get_db)):
-    j = JuegoController.update(db, juego_id, payload)
-    if not j:
-        raise HTTPException(404, "Juego not found")
-    return j
+    result = JuegoController.search(db, nombre, inventario_id)
 
-@router.delete("/{juego_id}")
-def delete_juego(juego_id: int, db: Session = Depends(get_db)):
-    j = JuegoController.delete(db, juego_id)
-    if not j:
-        raise HTTPException(404, "Juego not found")
-    return {"detail": "deleted"}
+    if not result:
+        raise HTTPException(404, "No hay existencias")
+
+    return result

@@ -1,19 +1,20 @@
 from pydantic import BaseModel
 from typing import Optional
 
-class JuegoBase(BaseModel):
-    nombre_juego: str
+class JuegoCatalogoResponse(BaseModel):
     inventario_id: int
+    nombre: str
+    precio: float
 
-class JuegoCreate(JuegoBase):
-    pass
+    model_config = {
+        "from_attributes": True
+    }
 
-class JuegoUpdate(BaseModel):
-    nombre_juego: Optional[str] = None
-    inventario_id: Optional[int] = None
+class JuegoSearchResponse(BaseModel):
+    inventario_id: int
+    nombre: str
+    precio: float
 
-class JuegoResponse(JuegoBase):
-    id: int
-
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
