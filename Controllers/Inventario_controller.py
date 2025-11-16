@@ -42,7 +42,7 @@ class InventarioController:
         if not obj:
             return None
 
-        # 🛑 Evitar duplicado con otro registro
+        #Evita duplicado con otro registro
         name_conflict = db.query(Inventario).filter(
             Inventario.nombre == data.nombre,
             Inventario.id != inv_id
