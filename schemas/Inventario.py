@@ -1,3 +1,4 @@
+# schemas/Inventario.py
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
@@ -16,8 +17,8 @@ class InventarioUpdate(InventarioBase):
 
 class InventarioResponse(InventarioBase):
     id: int
-    fecha_actualizacion: Optional[datetime] = None
+    fecha_actualizacion: Optional[datetime]
 
     model_config = {
-        "from_attributes": True   # reemplaza orm_mode
+        "from_attributes": True
     }

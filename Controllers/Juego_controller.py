@@ -1,49 +1,105 @@
+# Controllers/Juego_controller.py
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 from models.Juego import Juego
-from models.Inventario import Inventario
+from schemas.Juego import JuegoCreate, JuegoUpdate
 
 
 class JuegoController:
 
     @staticmethod
-    def list_catalog(db: Session):
-        """
-        Retorna todos los juegos del inventario mostrando:
-        id_inventario, nombre y precio
-        """
-        inventario_items = db.query(Inventario).all()
-
-        return [
-            {
-                "inventario_id": item.id,
-                "nombre": item.nombre,
-                "precio": item.precio
-            }
-            for item in inventario_items
-        ]
+    def list_all(db: Session):
+        return db.query(Juego).all()
 
     @staticmethod
-    def search(db: Session, nombre: str , inventario_id: int):
-        """
-        Busca por nombre del juego o por id_inventario.
-        Si no existe devuelve None.
-        """
+    def get_by_id(db: Session, juego_id: int):
+        return db.query(Juego).filter(Juego.id == juego_id).first()
 
-        query = db.query(Inventario)
+    @staticmethod
+    def get_by_inventario_id(db: Session, inventario_id: int):
+        return db.query(Juego).filter(Juego.inventario_id == inventario_id).first()
 
-        if inventario_id:
-            query = query.filter(Inventario.id == inventario_id)
+    @staticmethod
+    def find_by_nombre(db: Session, nombre: str):
+        return db.query(Juego).filter(Juego.nombre.ilike(f"%{nombre}%")).all()
 
-        if nombre:
-            query = query.filter(Inventario.nombre.ilike(f"%{nombre}%"))
+    @staticmethod
+    def create(db: Session, data: JuegoCreate):
 
-        result = query.first()
+        exists_inv = db.query(Juego).filter(
+            Juego.inventario_id == data.inventario_id
+        ).first()
+        if exists_inv:
+            raise ValueError("Ya existe un juego para ese inventario_id")
 
-        if not result:
+        exists_name = db.query(Juego).filter(
+            Juego.nombre == data.nombre
+        ).first()
+        if exists_name:
+            raise ValueError("Ya existe un juego con ese nombre en catálogo")
+
+        obj = Juego(
+            inventario_id=data.inventario_id,
+            nombre=data.nombre,
+            precio=data.precio,
+            descripcion=data.descripcion
+        )
+
+        try:
+            db.add(obj)
+            db.commit()
+            db.refresh(obj)
+        except SQLAlchemyError as e:
+            db.rollback()
+            raise e
+
+        return obj
+
+    @staticmethod
+    def update(db: Session, juego_id: int, data: JuegoUpdate):
+        obj = db.query(Juego).filter(Juego.id == juego_id).first()
+        if not obj:
             return None
 
-        return {
-            "inventario_id": result.id,
-            "nombre": result.nombre,
-            "precio": result.precio
-        }
+        if data.inventario_id != obj.inventario_id:
+            exists = db.query(Juego).filter(
+                Juego.inventario_id == data.inventario_id
+            ).first()
+            if exists:
+                raise ValueError("Ya existe un juego para ese inventario_id")
+
+        if data.nombre != obj.nombre:
+            existsn = db.query(Juego).filter(
+                Juego.nombre == data.nombre
+            ).first()
+            if existsn:
+                raise ValueError("Ya existe un juego con ese nombre en catálogo")
+
+        obj.inventario_id = data.inventario_id
+        obj.nombre = data.nombre
+        obj.precio = data.precio
+        obj.descripcion = data.descripcion
+
+        try:
+            db.commit()
+            db.refresh(obj)
+        except SQLAlchemyError as e:
+            db.rollback()
+            raise e
+
+        return obj
+
+    @staticmethod
+    def delete(db: Session, juego_id: int):
+        obj = db.query(Juego).filter(Juego.id == juego_id).first()
+        if not obj:
+            return None
+
+        try:
+            db.delete(obj)
+            db.commit()
+        except SQLAlchemyError as e:
+            db.rollback()
+            raise e
+
+        return obj
