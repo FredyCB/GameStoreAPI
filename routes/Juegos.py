@@ -1,3 +1,4 @@
+# routes/Juegos.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from utils.database import get_db
@@ -5,7 +6,8 @@ from utils.database import get_db
 from Controllers.Juego_controller import JuegoController
 from schemas.Juego import JuegoCreate, JuegoUpdate, JuegoResponse
 
-router = APIRouter(prefix="/juegos", tags=["Juegos"])
+# SIN prefix aquí
+router = APIRouter(tags=["Juegos"])
 
 @router.get("/", response_model=list[JuegoResponse])
 def list_all(db: Session = Depends(get_db)):
@@ -33,7 +35,3 @@ def delete(juego_id: int, db: Session = Depends(get_db)):
 @router.get("/buscar", response_model=list[JuegoResponse])
 def buscar(nombre: str, db: Session = Depends(get_db)):
     return JuegoController.find_by_nombre(db, nombre)
-
-@router.get("/por_inventario/{inventario_id}", response_model=list[JuegoResponse])
-def juegos_por_inventario(inventario_id: int, db: Session = Depends(get_db)):
-    return JuegoController.get_by_inventario_id(db, inventario_id)

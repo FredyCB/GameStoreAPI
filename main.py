@@ -1,16 +1,24 @@
+# main.py
 import uvicorn
 from fastapi import FastAPI
 from datetime import datetime
-from routes import Clientes, Inventario, Juegos, Orden
 
-app = FastAPI(title="GameStore API", json_encoders={
-    datetime: lambda dt: dt.isoformat()
-})
+# Importar SOLO los routers correctos
+from routes.Clientes import router as clientes_router
+from routes.Inventario import router as inventarios_router
+from routes.Juegos import router as juegos_router
+from routes.Orden import router as ordenes_router
 
-app.include_router(Clientes.router, prefix="/clientes", tags=["Clientes"])
-app.include_router(Inventario.router, prefix="/inventario", tags=["Inventario"])
-app.include_router(Juegos.router, prefix="/juegos", tags=["Juegos"])
-app.include_router(Orden.router, prefix="/ordenes", tags=["Ordenes"])
+app = FastAPI(
+    title="GameStore API",
+    json_encoders={datetime: lambda dt: dt.isoformat()},
+)
+
+# Registrar los routers
+app.include_router(clientes_router, prefix="/clientes", tags=["Clientes"])
+app.include_router(inventarios_router, prefix="/inventarios", tags=["Inventarios"])
+app.include_router(juegos_router, prefix="/juegos", tags=["Juegos"])
+app.include_router(ordenes_router, prefix="/ordenes", tags=["Ordenes"])
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

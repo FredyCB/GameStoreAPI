@@ -1,3 +1,4 @@
+#routes/Inventario.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from utils.database import get_db
@@ -5,7 +6,8 @@ from utils.database import get_db
 from Controllers.Inventario_controller import InventarioController
 from schemas.Inventario import InventarioCreate, InventarioUpdate, InventarioResponse
 
-router = APIRouter(prefix="/inventarios", tags=["Inventarios"])
+# SIN prefix aquí
+router = APIRouter(tags=["Inventarios"])
 
 @router.get("/", response_model=list[InventarioResponse])
 def list_all(db: Session = Depends(get_db)):
