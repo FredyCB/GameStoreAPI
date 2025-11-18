@@ -24,43 +24,11 @@ class JuegoController:
         return db.query(Juego).filter(Juego.nombre.ilike(f"%{nombre}%")).all()
 
     @staticmethod
-    def create(db: Session, data: JuegoCreate):
-
-        exists_inv = db.query(Juego).filter(
-            Juego.inventario_id == data.inventario_id
-        ).first()
-        if exists_inv:
-            raise ValueError("Ya existe un juego para ese inventario_id")
-
-        exists_name = db.query(Juego).filter(
-            Juego.nombre == data.nombre
-        ).first()
-        if exists_name:
-            raise ValueError("Ya existe un juego con ese nombre en catálogo")
-
-        obj = Juego(
-            inventario_id=data.inventario_id,
-            nombre=data.nombre,
-            precio=data.precio,
-            descripcion=data.descripcion
-        )
-
-        try:
-            db.add(obj)
-            db.commit()
-            db.refresh(obj)
-        except SQLAlchemyError as e:
-            db.rollback()
-            raise e
-
-        return obj
-
-    @staticmethod
     def update(db: Session, juego_id: int, data: JuegoUpdate):
         obj = db.query(Juego).filter(Juego.id == juego_id).first()
         if not obj:
             return None
-
+        
         if data.inventario_id != obj.inventario_id:
             exists = db.query(Juego).filter(
                 Juego.inventario_id == data.inventario_id

@@ -25,13 +25,6 @@ def get_por_inventario(inventario_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="No hay existencias")
     return j
 
-@router.post("/", response_model=JuegoResponse)
-def create_juego(payload: JuegoCreate, db: Session = Depends(get_db)):
-    try:
-        return JuegoController.create(db, payload)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
 @router.put("/{juego_id}", response_model=JuegoResponse)
 def update_juego(juego_id: int, payload: JuegoUpdate, db: Session = Depends(get_db)):
     try:
