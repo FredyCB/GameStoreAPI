@@ -21,11 +21,3 @@ def get_client(cliente_id: int, db: Session = Depends(get_db)):
 def create_client(payload: ClienteCreate, db: Session = Depends(get_db)):
     return ClienteController.create(db, payload)
 
-
-
-@router.delete("/{cliente_id}")
-def delete_client(cliente_id: int, db: Session = Depends(get_db)):
-    res = ClienteController.delete(db, cliente_id)
-    if not res:
-        raise HTTPException(404, "Cliente not found")
-    return {"detail": "deleted"}

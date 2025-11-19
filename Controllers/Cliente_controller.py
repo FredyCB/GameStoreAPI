@@ -16,9 +16,3 @@ class ClienteController:
         db.add(obj); db.commit(); db.refresh(obj)
         return obj
 
-    @staticmethod
-    def delete(db: Session, cliente_id: int):
-        obj = db.query(Clientes).filter(Clientes.id == cliente_id).first()
-        if not obj: return None
-        db.delete(obj); db.commit()
-        return obj
