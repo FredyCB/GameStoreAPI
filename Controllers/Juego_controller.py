@@ -20,10 +20,6 @@ class JuegoController:
         return db.query(Juego).filter(Juego.inventario_id == inventario_id).first()
 
     @staticmethod
-    def find_by_nombre(db: Session, nombre: str):
-        return db.query(Juego).filter(Juego.nombre.ilike(f"%{nombre}%")).all()
-
-    @staticmethod
     def update(db: Session, juego_id: int, data: JuegoUpdate):
         obj = db.query(Juego).filter(Juego.id == juego_id).first()
         if not obj:
