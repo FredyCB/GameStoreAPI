@@ -7,11 +7,12 @@ class Orden(Base):
     __tablename__ = "Ordenes"
 
     id = Column(Integer, primary_key=True, index=True)
-
     cliente_id = Column(Integer, ForeignKey("Clientes.id"), nullable=False)
-    cliente_nombre = Column(String(120), nullable=False)   # <-- CAMPO FALTANTE
-
+    cliente_nombre = Column(String(120), nullable=False)  # agregado para almacenar nombre cliente
     fecha_orden = Column(DateTime, server_default=func.now(), nullable=False)
+    total = Column(DECIMAL(12,2), default=0, nullable=False)
+    estado = Column(String(50), default="Pendiente", nullable=False)
 
-    total = Column(DECIMAL(10,2), nullable=False, default=0)
-    estado = Column(String(20), default="Pendiente")
+    # relación con detalle de la Orden
+    detalles = relationship("DetalleOrden", back_populates="orden", cascade="all, delete-orphan")
+

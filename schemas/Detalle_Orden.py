@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from decimal import Decimal
+from typing import Optional
 
 class DetalleItem(BaseModel):
     nombre_juego: str
@@ -11,9 +12,9 @@ class DetalleOrdenBase(BaseModel):
     cantidad: int
     precio_unitario: Decimal
 
-class DetalleOrdenResponse(DetalleOrdenBase):
-    id: int
-
     model_config = {
         "from_attributes": True
     }
+
+class DetalleOrdenResponse(DetalleOrdenBase):
+    id: int

@@ -1,14 +1,11 @@
 from pydantic import BaseModel
-from typing import List
 from datetime import datetime
-
-class OrdenJuegoItem(BaseModel):
-    nombre_juego: str
-    cantidad: int
+from typing import List
+from .Detalle_Orden import DetalleOrdenResponse, DetalleItem
 
 class OrdenCreate(BaseModel):
     cliente_id: int
-    juegos: List[OrdenJuegoItem]
+    juegos: List[DetalleItem]
 
 class OrdenResponse(BaseModel):
     id: int
@@ -17,6 +14,7 @@ class OrdenResponse(BaseModel):
     fecha_orden: datetime
     total: float
     estado: str
+    detalles: List[DetalleOrdenResponse] = []
 
     model_config = {
         "from_attributes": True

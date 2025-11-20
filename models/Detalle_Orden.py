@@ -13,6 +13,6 @@ class DetalleOrden(Base):
     cantidad = Column(Integer, nullable=False)
     precio_unitario = Column(DECIMAL(10, 2), nullable=False)
 
-    # Relaciones opcionales
-    orden = relationship("Orden", backref="detalles")
+    # Relaciones con Inventario y Orden
+    orden = relationship("Orden", back_populates="detalles")
     inventario = relationship("Inventario")
