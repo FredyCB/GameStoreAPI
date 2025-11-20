@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-
 from models.Cliente import Clientes
 from models.Inventario import Inventario
+
 from models.Orden import Orden
 from models.Detalle_Orden import DetalleOrden
 
@@ -60,7 +60,6 @@ class OrdenController:
 
             db.add(detalle)
 
-        # ACTUALIZAR TOTAL FINAL
         try:
             orden.total = total
             db.commit()

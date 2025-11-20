@@ -1,4 +1,3 @@
-# Controllers/Inventario_controller.py
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from models.Inventario import Inventario
@@ -17,7 +16,7 @@ class InventarioController:
 
     @staticmethod
     def create(db: Session, data: InventarioCreate):
-        # Previene duplicados por nombre
+        # Previene duplicados en inventario por nombre
         existing = db.query(Inventario).filter(Inventario.nombre == data.nombre).first()
         if existing:
             raise ValueError("Ya existe una entrada de inventario con ese nombre")
@@ -39,7 +38,7 @@ class InventarioController:
         # Crear o sincronizar el registro en Juegos (si no existe)
         juego = db.query(Juego).filter(Juego.inventario_id == obj.id).first()
         if not juego:
-            # NO permitimos duplicados por inventario_id en Juegos; inventario_id es único en Juegos
+            # NO permite duplicados por inventario_id en Juegos; inventario_id es único en Juegos
             j = Juego(
                 inventario_id=obj.id,
                 nombre=obj.nombre,
@@ -53,7 +52,7 @@ class InventarioController:
                 db.rollback()
                 # No bloquear creación de inventario: solo registrar el problema
         else:
-            # si ya existía, sincronizamos nombre/precio
+            # si ya existía, sincronizamos nombre y precio
             juego.nombre = obj.nombre
             juego.precio = obj.precio
             try:

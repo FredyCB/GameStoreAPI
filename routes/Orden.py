@@ -23,3 +23,14 @@ def create_order(payload: OrdenCreate, db: Session = Depends(get_db)):
         return OrdenController.create(db, payload)
     except Exception as e:
         raise HTTPException(400, str(e))
+
+
+@router.delete("/{orden_id}", response_model=OrdenResponse)
+def delete_order(orden_id: int, db: Session = Depends(get_db)):
+    try:
+        orden = OrdenController.delete(db, orden_id)
+        if not orden:
+            raise HTTPException(404, "Orden no encontrada")
+        return orden
+    except Exception as e:
+        raise HTTPException(400, str(e))

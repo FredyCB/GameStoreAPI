@@ -1,4 +1,3 @@
-# routes/Juegos.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from utils.database import get_db
@@ -6,7 +5,7 @@ from utils.database import get_db
 from Controllers.Juego_controller import JuegoController
 from schemas.Juego import JuegoCreate, JuegoUpdate, JuegoResponse
 
-# SIN prefix aquí
+
 router = APIRouter(tags=["Juegos"])
 
 @router.get("/", response_model=list[JuegoResponse])
@@ -31,7 +30,3 @@ def update(juego_id: int, payload: JuegoUpdate, db: Session = Depends(get_db)):
 @router.delete("/{juego_id}", response_model=JuegoResponse)
 def delete(juego_id: int, db: Session = Depends(get_db)):
     return JuegoController.delete(db, juego_id)
-
-@router.get("/buscar", response_model=list[JuegoResponse])
-def buscar(nombre: str, db: Session = Depends(get_db)):
-    return JuegoController.find_by_nombre(db, nombre)

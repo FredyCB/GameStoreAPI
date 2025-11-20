@@ -3,7 +3,7 @@ import uvicorn
 from fastapi import FastAPI
 from datetime import datetime
 
-# Importar SOLO los routers correctos
+# Importacion de los routers
 from routes.Clientes import router as clientes_router
 from routes.Inventario import router as inventarios_router
 from routes.Juegos import router as juegos_router
@@ -14,7 +14,7 @@ app = FastAPI(
     json_encoders={datetime: lambda dt: dt.isoformat()},
 )
 
-# Registrar los routers
+# Registrar los routers en la API
 app.include_router(clientes_router, prefix="/clientes", tags=["Clientes"])
 app.include_router(inventarios_router, prefix="/inventarios", tags=["Inventarios"])
 app.include_router(juegos_router, prefix="/juegos", tags=["Juegos"])
